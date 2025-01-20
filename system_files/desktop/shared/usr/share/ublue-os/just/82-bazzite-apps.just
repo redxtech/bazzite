@@ -158,7 +158,8 @@ install-opentabletdriver:
     mkdir -p $HOME/.config/systemd/user && \
     curl -s https://raw.githubusercontent.com/flathub/net.opentabletdriver.OpenTabletDriver/refs/heads/master/scripts/opentabletdriver.service > $HOME/.config/systemd/user/opentabletdriver.service  && \
     systemctl --user daemon-reload && \
-    systemctl enable --user --now opentabletdriver.service
+    systemctl enable --user --now arch-opentabletdriver.service && \
+    distrobox enter -n arch -- bash -c 'distrobox-export --app otd-gui'
 
 # Install Docker, a platform designed to help developers build, share, and run container applications
 install-docker:
