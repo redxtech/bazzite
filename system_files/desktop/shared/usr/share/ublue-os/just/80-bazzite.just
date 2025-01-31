@@ -11,7 +11,54 @@ _install-system-flatpaks:
         FLATPAKS="kde_flatpaks/flatpaks"
     fi
     FLATPAK_LIST="$(curl https://raw.githubusercontent.com/ublue-os/bazzite/main/installer/${FLATPAKS} | tr '\n' ' ')"
-    flatpak --system -y install --or-update ${FLATPAK_LIST}
+    flatpak --system -y install --reinstall --or-update ${FLATPAK_LIST}
+
+# Toggle SSH availability on boot
+toggle-ssh:
+    #!/usr/bin/bash
+    source /usr/lib/ujust/ujust.sh
+    # Get hostname and IP address
+    HOSTNAME=$(hostname)
+    IP_ADDRESS=$(hostname -I | awk '{print $1}') # First IP address
+    # Get current SSH status
+    SSH_STATUS="Disabled"
+    if systemctl is-enabled sshd | grep -q enabled; then
+      SSH_STATUS="Enabled"
+    fi
+    # Display current status
+    echo -e "\n${bold}Hostname:${normal} $HOSTNAME"
+    echo -e "${bold}IP Address:${normal} $IP_ADDRESS"
+    if [ "$SSH_STATUS" == "Enabled" ]; then
+      echo -e "${bold}SSH Availability on Boot:${normal} ${green}$SSH_STATUS${normal}\n"
+    else
+      echo -e "${bold}SSH Availability on Boot:${normal} ${yellow}$SSH_STATUS${normal}\n"
+    fi
+    # Prompt user for action
+    echo "Choose an option:"
+    CHOICE=$(ugum choose "Enable SSH" "Disable SSH" "Exit without saving")
+    case "$CHOICE" in
+      "Enable SSH")
+        echo "Enabling SSH on boot..."
+        sudo systemctl enable sshd
+        sudo systemctl start sshd
+        echo -e "SSH is now ${green}Enabled${normal}. You can SSH using:"
+        echo -e "${bold}${USER}@${IP_ADDRESS}${normal}"
+        echo " "
+        ;;
+      "Disable SSH")
+        echo "Disabling SSH on boot..."
+        sudo systemctl disable sshd
+        sudo systemctl stop sshd
+        echo -e "SSH is now ${yellow}Disabled${normal}."
+        echo " "
+        ;;
+      "Exit without saving")
+        echo "No changes made."
+        ;;
+      *)
+        echo "Invalid choice. Exiting without changes."
+        ;;
+    esac
 
 # Configure grub bootmenu visibility. pass action 'help' for more info.
 configure-grub ACTION="":
@@ -162,7 +209,7 @@ configure-watchdog ACTION="":
       echo "Watchdog is $WATCHDOG_STATE"
       OPTION=$(Choose "Enable Watchdog" "Disable Watchdog")
     fi
-    if [[ "$OPTION" =~ ^enable ]]; then
+    if [[ "${OPTION,,}" =~ ^enable ]]; then
       WATCHDOG_KARGS="--delete-if-present=nowatchdog"
       if [[ "$CPU_MODEL" =~ "Intel" ]]; then
         WATCHDOG_KARGS="$WATCHDOG_KARGS --delete-if-present=modprobe.blacklist=iTCO_wdt"
@@ -170,7 +217,7 @@ configure-watchdog ACTION="":
         WATCHDOG_KARGS="$WATCHDOG_KARGS --delete-if-present=modprobe.blacklist=sp5100_tco"
       fi
       rpm-ostree kargs $WATCHDOG_KARGS
-    elif [[ "$OPTION" =~ ^disable ]]; then
+    elif [[ "${OPTION,,}" =~ ^disable ]]; then
       WATCHDOG_KARGS="--append-if-missing=nowatchdog"
       if [[ "$CPU_MODEL" =~ "Intel" ]]; then
         WATCHDOG_KARGS="$WATCHDOG_KARGS --append-if-missing=modprobe.blacklist=iTCO_wdt"
@@ -496,54 +543,16 @@ get-decky-bazzite-buddy:
     # Prompt user to restart Decky Loader
     echo "Please restart Decky Loader to activate the plugin."
 
-post-gamescope-logs:
-    #!/usr/bin/bash
-    OUTPUT_FILE="/tmp/gathered_info.txt"
-
-    # Clear the output file or create it if it doesn't exist
-    > "$OUTPUT_FILE"
-
-    # Gather information from various sources
-    {
-        echo "GPU info"
-        lshw -C display
-
-        # Add a blank line for readability
-        echo
-
-        filepaths=(
-            "/sys/devices/virtual/dmi/id/bios_date"
-            "/sys/devices/virtual/dmi/id/board_name"
-            "/sys/devices/virtual/dmi/id/board_vendor"
-            "/sys/devices/virtual/dmi/id/product_name"
-            "$HOME/.gamescope-cmd.log"
-            "$HOME/.gamescope-stdout.log"
-        )
-
-        # Iterate over each file path in the array
-        for filepath in "${filepaths[@]}"; do
-            # Print the file path
-            echo "File: $filepath"
-
-            # Check if the file exists before trying to read it
-            if [[ -f "$filepath" ]]; then
-                # Print the file content
-                cat "$filepath"
-            else
-                echo "File not found: $filepath"
-            fi
-
-            # Add a blank line for readability
-            echo
-        done
-
-        echo "----- Contents of $HOME/.config/environment.d/ -----"
-        mkdir -p $HOME/.config/environment.d
-        cat "$HOME/.config/environment.d/"* 2>/dev/null || echo "No files found in $HOME/.config/environment.d/"
-
-    } >> "$OUTPUT_FILE"
-
-    fpaste $OUTPUT_FILE
-
-    # cleanup output file
-    rm -rf $OUTPUT_FILE
+# get logs for this boot and last boot, cleanly output in terminal as pastebin links, to simplify troubleshooting and issue reporting.
+get-logs:
+    #!/bin/bash
+    set -euo pipefail
+    source /usr/lib/ujust/ujust.sh
+    # Get logs for this boot
+    this_boot_logs=$(journalctl -b | fpaste 2>/dev/null)
+    echo -e "${bold}Logs This Boot:${normal} $this_boot_logs"
+    echo " "
+    # Get logs for last boot
+    last_boot_logs=$(journalctl -b -1 | fpaste 2>/dev/null)
+    echo -e "${bold}Logs Last Boot:${normal} $last_boot_logs"
+    echo " "
