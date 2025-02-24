@@ -82,6 +82,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
         kylegospo/bazzite \
         kylegospo/bazzite-multilib \
         ublue-os/staging \
+        ublue-os/packages \
         kylegospo/LatencyFleX \
         kylegospo/obs-vkcapture \
         kylegospo/wallpaper-engine-kde-plugin \
@@ -494,6 +495,18 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     /tmp/brew-install && \
     tar --zstd -cvf /usr/share/homebrew.tar.zst /home/linuxbrew/.linuxbrew && \
     curl -Lo /usr/share/bash-prexec https://raw.githubusercontent.com/ublue-os/bash-preexec/master/bash-preexec.sh &&\
+    /ctx/cleanup
+
+# media-automount-generator, mount non-removable device partitions automatically under /media/media-automount/
+RUN --mount=type=cache,dst=/var/cache/libdnf5 \
+    --mount=type=cache,dst=/var/cache/rpm-ostree \
+    --mount=type=bind,from=ctx,source=/,target=/ctx \
+    --mount=type=tmpfs,dst=/tmp \
+    cd $(mktemp -d) && \
+    curl -fsSLo - https://github.com/Zeglius/media-automount-generator/archive/refs/tags/v0.2.3.tar.gz | \
+        tar -xz --strip-components=1 && \
+    ./install.sh && \
+    cd / && \
     /ctx/cleanup
 
 # Cleanup & Finalize
