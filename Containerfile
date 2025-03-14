@@ -79,17 +79,17 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     --mount=type=tmpfs,dst=/tmp \
     dnf5 -y install dnf5-plugins && \
     for copr in \
-        kylegospo/bazzite \
-        kylegospo/bazzite-multilib \
+        bazzite-org/bazzite \
+        bazzite-org/bazzite-multilib \
         ublue-os/staging \
         ublue-os/packages \
-        kylegospo/LatencyFleX \
-        kylegospo/obs-vkcapture \
-        kylegospo/wallpaper-engine-kde-plugin \
+        bazzite-org/LatencyFleX \
+        bazzite-org/obs-vkcapture \
+        bazzite-org/wallpaper-engine-kde-plugin \
         ycollet/audinux \
-        kylegospo/rom-properties \
-        kylegospo/webapp-manager \
-        kylegospo/vk_hdr_layer \
+        bazzite-org/rom-properties \
+        bazzite-org/webapp-manager \
+        bazzite-org/vk_hdr_layer \
         hhd-dev/hhd \
         che/nerd-fonts \
         hikariknight/looking-glass-kvmfr \
@@ -133,7 +133,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/install-kernel-akmods && \
     for toswap in linux-firmware netronome-firmware libertas-firmware atheros-firmware realtek-firmware tiwilink-firmware cirrus-audio-firmware linux-firmware-whence iwlwifi-dvm-firmware iwlwifi-mvm-firmware amd-ucode-firmware qcom-firmware mt7xxx-firmware liquidio-firmware nxpwireless-firmware intel-vsc-firmware nvidia-gpu-firmware intel-audio-firmware amd-gpu-firmware iwlegacy-firmware intel-gpu-firmware mlxsw_spectrum-firmware qed-firmware mrvlprestera-firmware brcmfmac-firmware dvb-firmware; do \
-        dnf5 -y swap --repo copr:copr.fedorainfracloud.org:kylegospo:bazzite $toswap $toswap; \
+        dnf5 -y swap --repo copr:copr.fedorainfracloud.org:bazzite-org:bazzite $toswap $toswap; \
     done && unset -v toswap && \
     dnf5 -y config-manager setopt "*rpmfusion*".enabled=0 && \
     dnf5 -y copr enable bieszczaders/kernel-cachyos-addons && \
@@ -141,7 +141,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
         scx-scheds && \
     dnf5 -y copr disable bieszczaders/kernel-cachyos-addons && \
     for toswap in rpm-ostree bootc; do \
-        dnf5 -y swap --repo copr:copr.fedorainfracloud.org:kylegospo:bazzite $toswap $toswap; \
+        dnf5 -y swap --repo copr:copr.fedorainfracloud.org:bazzite-org:bazzite $toswap $toswap; \
     done && unset -v toswap && \
     /ctx/cleanup
 
@@ -183,7 +183,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
     declare -A toswap=( \
-        ["copr:copr.fedorainfracloud.org:kylegospo:bazzite-multilib"]="pipewire bluez xorg-x11-server-Xwayland" \
+        ["copr:copr.fedorainfracloud.org:bazzite-org:bazzite-multilib"]="pipewire bluez xorg-x11-server-Xwayland" \
         ["terra-extras"]="switcheroo-control" \
         ["terra-mesa"]="mesa-filesystem" \
         ["copr:copr.fedorainfracloud.org:ublue-os:staging"]="fwupd" \
@@ -320,7 +320,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
         rocm-clinfo \
         rocm-smi && \
     dnf5 -y install \
-        $(curl https://api.github.com/repos/KyleGospo/cicpoffs/releases/latest | jq -r '.assets[] | select(.name| test(".*rpm$")).browser_download_url') && \
+        $(curl https://api.github.com/repos/bazzite-org/cicpoffs/releases/latest | jq -r '.assets[] | select(.name| test(".*rpm$")).browser_download_url') && \
     mkdir -p /etc/xdg/autostart && \
     sed -i~ -E 's/=.\$\(command -v (nft|ip6?tables-legacy).*/=/g' /usr/lib/waydroid/data/scripts/waydroid-net.sh && \
     sed -i '1s/^/[include]\npaths = ["\/etc\/ublue-os\/topgrade.toml"]\n\n/' /usr/share/ublue-update/topgrade-user.toml && \
@@ -329,9 +329,9 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     sed -i 's/max_mem_percent.*/max_mem_percent = 90.0/' /etc/ublue-update/ublue-update.toml && \
     sed -i 's/dbus_notify.*/dbus_notify = false/' /etc/ublue-update/ublue-update.toml && \
     sed -i 's/ --xdg-runtime=\\"${XDG_RUNTIME_DIR}\\"//g' /usr/bin/btrfs-assistant-launcher && \
-    curl -Lo /usr/bin/installcab https://raw.githubusercontent.com/KyleGospo/steam-proton-mf-wmv/master/installcab.py && \
+    curl -Lo /usr/bin/installcab https://raw.githubusercontent.com/bazzite-org/steam-proton-mf-wmv/master/installcab.py && \
     chmod +x /usr/bin/installcab && \
-    curl -Lo /usr/bin/install-mf-wmv https://github.com/KyleGospo/steam-proton-mf-wmv/blob/master/install-mf-wmv.sh && \
+    curl -Lo /usr/bin/install-mf-wmv https://github.com/bazzite-org/steam-proton-mf-wmv/blob/master/install-mf-wmv.sh && \
     chmod +x /usr/bin/install-mf-wmv && \
     curl -Lo /tmp/ls-iommu.tar.gz $(curl https://api.github.com/repos/HikariKnight/ls-iommu/releases/latest | jq -r '.assets[] | select(.name| test(".*x86_64.tar.gz$")).browser_download_url') && \
     mkdir -p /tmp/ls-iommu && \
@@ -352,7 +352,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
     dnf5 -y swap \
-    --repo copr:copr.fedorainfracloud.org:kylegospo:bazzite \
+    --repo copr:copr.fedorainfracloud.org:bazzite-org:bazzite \
         ibus ibus && \
     dnf5 versionlock add \
         ibus && \
@@ -390,7 +390,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     rm -f /tmp/latencyflex.tar.xz && \
     mkdir -p /usr/lib64/latencyflex && \
     cp -r /tmp/latencyflex/wine/usr/lib/wine/* /usr/lib64/latencyflex/ && \
-    curl -Lo /usr/bin/latencyflex https://raw.githubusercontent.com/KyleGospo/LatencyFleX-Installer/main/install.sh && \
+    curl -Lo /usr/bin/latencyflex https://raw.githubusercontent.com/bazzite-org/LatencyFleX-Installer/main/install.sh && \
     chmod +x /usr/bin/latencyflex && \
     curl -Lo /usr/bin/winetricks https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks && \
     chmod +x /usr/bin/winetricks && \
@@ -447,12 +447,12 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
         dnf5 versionlock add \
             gnome-shell && \
         dnf5 -y swap \
-        --repo copr:copr.fedorainfracloud.org:kylegospo:bazzite-multilib \
+        --repo copr:copr.fedorainfracloud.org:bazzite-org:bazzite-multilib \
             gsettings-desktop-schemas gsettings-desktop-schemas && \
         dnf5 versionlock add \
             gsettings-desktop-schemas && \
         dnf5 -y swap \
-        --repo copr:copr.fedorainfracloud.org:kylegospo:bazzite-multilib \
+        --repo copr:copr.fedorainfracloud.org:bazzite-org:bazzite-multilib \
             mutter mutter && \
         dnf5 versionlock add \
             mutter && \
@@ -595,15 +595,15 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     sed -i 's/stage/none/g' /etc/rpm-ostreed.conf && \
     sed -i 's@enabled=1@enabled=0@g' /etc/yum.repos.d/_copr_ublue-os-akmods.repo && \
     for copr in \
-        kylegospo/bazzite \
-        kylegospo/bazzite-multilib \
+        bazzite-org/bazzite \
+        bazzite-org/bazzite-multilib \
         ublue-os/staging \
-        kylegospo/LatencyFleX \
-        kylegospo/obs-vkcapture \
-        kylegospo/wallpaper-engine-kde-plugin \
+        bazzite-org/LatencyFleX \
+        bazzite-org/obs-vkcapture \
+        bazzite-org/wallpaper-engine-kde-plugin \
         ycollet/audinux \
-        kylegospo/rom-properties \
-        kylegospo/webapp-manager \
+        bazzite-org/rom-properties \
+        bazzite-org/webapp-manager \
         hhd-dev/hhd \
         che/nerd-fonts \
         mavit/discover-overlay \
@@ -648,7 +648,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     systemctl disable waydroid-container.service && \
     systemctl disable force-wol.service && \
     curl -Lo /etc/dxvk-example.conf https://raw.githubusercontent.com/doitsujin/dxvk/master/dxvk.conf && \
-    curl -Lo /usr/bin/waydroid-choose-gpu https://raw.githubusercontent.com/KyleGospo/waydroid-scripts/main/waydroid-choose-gpu.sh && \
+    curl -Lo /usr/bin/waydroid-choose-gpu https://raw.githubusercontent.com/bazzite-org/waydroid-scripts/main/waydroid-choose-gpu.sh && \
     chmod +x /usr/bin/waydroid-choose-gpu && \
     curl -Lo /usr/lib/sysctl.d/99-bore-scheduler.conf https://github.com/CachyOS/CachyOS-Settings/raw/master/usr/lib/sysctl.d/99-bore-scheduler.conf && \
     curl -Lo /etc/distrobox/docker.ini https://github.com/ublue-os/toolboxes/raw/refs/heads/main/apps/docker/distrobox.ini && \
@@ -684,11 +684,11 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
     sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/_copr_ublue-os-akmods.repo && \
-    dnf5 -y copr enable kylegospo/bazzite && \
-    dnf5 -y copr enable kylegospo/bazzite-multilib && \
-    dnf5 -y copr enable kylegospo/LatencyFleX && \
-    dnf5 -y copr enable kylegospo/obs-vkcapture && \
-    dnf5 -y copr enable kylegospo/wallpaper-engine-kde-plugin && \
+    dnf5 -y copr enable bazzite-org/bazzite && \
+    dnf5 -y copr enable bazzite-org/bazzite-multilib && \
+    dnf5 -y copr enable bazzite-org/LatencyFleX && \
+    dnf5 -y copr enable bazzite-org/obs-vkcapture && \
+    dnf5 -y copr enable bazzite-org/wallpaper-engine-kde-plugin && \
     dnf5 -y copr enable hhd-dev/hhd && \
     dnf5 -y copr enable ycollet/audinux && \
     /ctx/cleanup
@@ -758,7 +758,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
     dnf5 -y swap \
-    --repo copr:copr.fedorainfracloud.org:kylegospo:bazzite \
+    --repo copr:copr.fedorainfracloud.org:bazzite-org:bazzite \
         upower upower && \
     dnf5 versionlock add \
         upower \
@@ -774,7 +774,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     mkdir -p /usr/share/gamescope-session-plus/ && \
     curl -Lo /usr/share/gamescope-session-plus/bootstrap_steam.tar.gz https://large-package-sources.nobaraproject.org/bootstrap_steam.tar.gz && \
     dnf5 -y install \
-    --repo copr:copr.fedorainfracloud.org:kylegospo:bazzite \
+    --repo copr:copr.fedorainfracloud.org:bazzite-org:bazzite \
         gamescope-session-plus \
         gamescope-session-steam && \
     /ctx/cleanup
@@ -797,11 +797,11 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     sed -i "s/^SCX_SCHEDULER=.*/SCX_SCHEDULER=scx_lavd/" /etc/default/scx && \
     sed -i 's@enabled=0@enabled=1@g' /etc/yum.repos.d/_copr_ublue-os-akmods.repo && \
     for copr in \
-        kylegospo/bazzite \
-        kylegospo/bazzite-multilib \
-        kylegospo/LatencyFleX \
-        kylegospo/obs-vkcapture \
-        kylegospo/wallpaper-engine-kde-plugin \
+        bazzite-org/bazzite \
+        bazzite-org/bazzite-multilib \
+        bazzite-org/LatencyFleX \
+        bazzite-org/obs-vkcapture \
+        bazzite-org/wallpaper-engine-kde-plugin \
         hhd-dev/hhd \
         ycollet/audinux; \
     do \
