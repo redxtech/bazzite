@@ -78,6 +78,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
     dnf5 -y install dnf5-plugins && \
+    dnf5 -y downgrade dnf5 && \
     for copr in \
         bazzite-org/bazzite \
         bazzite-org/bazzite-multilib \
@@ -174,6 +175,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     ; fi && \
     /ctx/install-firmware && \
     /ctx/cleanup
+
 
 # Install patched fwupd
 # Install Valve's patched Mesa, Pipewire, Bluez, and Xwayland
@@ -438,6 +440,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
         sed -i '/^Comment/d' /usr/share/applications/org.gnome.Ptyxis.desktop && \
         sed -i 's@Exec=ptyxis@Exec=kde-ptyxis@g' /usr/share/applications/org.gnome.Ptyxis.desktop && \
         sed -i 's@Keywords=@Keywords=konsole;console;@g' /usr/share/applications/org.gnome.Ptyxis.desktop && \
+        sed -i 's|^Exec=plasma-discover %F$|Exec=plasma-discover --backends flatpak-backend %F|' /usr/share/applications/org.kde.discover.desktop && \
         cp /usr/share/applications/org.gnome.Ptyxis.desktop /usr/share/kglobalaccel/org.gnome.Ptyxis.desktop && \
         setcap 'cap_net_raw+ep' /usr/libexec/ksysguard/ksgrd_network_helper \
     ; else \
@@ -514,16 +517,13 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     curl -Lo /usr/share/bash-prexec https://raw.githubusercontent.com/ublue-os/bash-preexec/master/bash-preexec.sh &&\
     /ctx/cleanup
 
-# media-automount-generator, mount non-removable device partitions automatically under /media/media-automount/
+# ublue-os-media-automount-udev, mount non-removable device partitions automatically under /media/media-automount/
 RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     --mount=type=cache,dst=/var/cache/rpm-ostree \
     --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
-    cd $(mktemp -d) && \
-    curl -fsSLo - https://github.com/Zeglius/media-automount-generator/archive/refs/tags/v0.2.6.tar.gz | \
-        tar -xz --strip-components=1 && \
-    ./install.sh && \
-    cd / && \
+    dnf5 install -y --enable-repo=copr:copr.fedorainfracloud.org:ublue-os:packages \
+        install ublue-os-media-automount-udev && \
     /ctx/cleanup
 
 # Cleanup & Finalize
